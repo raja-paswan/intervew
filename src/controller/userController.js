@@ -127,4 +127,46 @@ const registerUser = async (req, res) => {
         }
     }
 
-    module.exports={registerUser,login}
+    const getUserProfile = async function(req,res){
+      try{
+          const userId = req.params.userId;
+         
+          if(!userId){
+              return res.status(400).send({status:false, message:`UserId is required`})
+          }
+          if(!isValidObjectId(userId)){
+              return res.status(400).send({status:false, message:`userId is invalid userId`})
+          }
+
+          //uncomment after varify token with
+  
+        //   const tokenUserId  = req.decodedToken     
+  
+        //   if(!tokenUserId){
+        //       return res.status(400).send({status:false, message:`tokenUserId is required`})
+        //   }
+  
+        //   if(!isValidObjectId(tokenUserId)){
+        //       return res.status(400).send({status:false, message:`tokenUser is invalid`})
+        //   }
+  
+        //   if(tokenUserId != userId){
+        //       return res.status(403).send({status:false, message:`user is not authorised to get profile of this user`})
+        //   }git
+  
+          let user = await userModel.findOne({_id: userId, isDeleted:false})
+  
+          if(!user){
+              return res.status(404).send({status:false, message:`User not found`})
+          }
+  
+          res.status(200).send({status:true, message:"User profile details", data: {user}})
+  
+      }catch(error){
+          res.status(500).send({status:false, message:error.message})
+          return
+      }
+  }
+  
+
+    module.exports={registerUser, login, getUserProfile }
