@@ -30,8 +30,7 @@ let userSchema = new mongoose.Schema(
             password: {
               type: String,
               required: true,
-              minLenght: 8,
-              maxLength: 15,
+             
             },
             address: {
               shipping: 
