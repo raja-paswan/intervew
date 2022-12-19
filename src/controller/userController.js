@@ -80,7 +80,7 @@ const registerUser = async (req, res) => {
     let salt = await bcrypt.genSalt(10);
     data.password = await bcrypt.hash(data.password, salt);
 
-    
+
     const user = await userModel.create(data);
     return res.status(201).send({
           status: true,
@@ -103,11 +103,11 @@ const registerUser = async (req, res) => {
             if(!email) return res.status(400).send({status : false , message : "email id is required"})
             if(!password) return res.status(400).send({status : false , message : "password  is required"})
             
-            if(!validemail(email)) return res.status(400).send({status : false , message : "email id is required"})
-            if(!validPassword(password)) return res.status(400).send({status : false , message : "password  is required"})
+            if(!isValidEmail(email)) return res.status(400).send({status : false , message : "email id is required"})
+            if(!isValidPassword(password)) return res.status(400).send({status : false , message : "password  is required"})
     
             let getUser = await userModel.findOne({email}).select({password : 1, _id : 0})
-            console.log(getUser)
+           
             if(!getUser) return res.status(404).send({status : false , message : "User Not Found"})
     
             const checkPassword = await bcrypt.compare( password, getUser.password)
@@ -156,13 +156,13 @@ const registerUser = async (req, res) => {
         //       return res.status(403).send({status:false, message:`user is not authorised to get profile of this user`})
         //   }git
   
-          let user = await userModel.findOne({_id: userId, isDeleted:false})
+          let user = await userModel.findOne({_id: userId})
   
           if(!user){
               return res.status(404).send({status:false, message:`User not found`})
           }
   
-          res.status(200).send({status:true, message:"User profile details", data: {user}})
+          res.status(200).send({status:true, message:"User profile details", data: user})
   
       }catch(error){
           res.status(500).send({status:false, message:error.message})
