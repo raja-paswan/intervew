@@ -1,9 +1,14 @@
 const express = require("express")
+const multer = require("multer")
 const mongoose = require("mongoose")
 const app = express()
 const route = require("./routes/route")
 app.use(express.json())
- mongoose.connect("mongodb+srv://AbhinavSIngh:9936522959@cluster0.wtmx5b4.mongodb.net/group1Database", { useNewUrlParser: true })
+
+app.use(multer().any())
+
+mongoose.set('strictQuery', false)
+mongoose.connect("mongodb+srv://AbhinavSIngh:9936522959@cluster0.wtmx5b4.mongodb.net/group1Database", { useNewUrlParser: true })
 
  .then(()=> console.log("MongoDb connected"))
  .catch((error)=>console.log(error))
