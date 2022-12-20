@@ -479,3 +479,8 @@ Refer below sample
   updatedAt: "2021-09-17T04:25:07.803Z",
 }
 ```
+//code bug;
+1. password length max 15 extend with encryted
+2. jsonwebtoken required
+3. token send response not have userId
+4. token send in authorization-bearer token not headers

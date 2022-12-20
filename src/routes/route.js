@@ -6,7 +6,8 @@ const userController = require("../controller/userController")
 
 router.post("/register",userController.registerUser)
 router.post("/login",userController.login)
-router.get("/user/:userId/profile ", MW.Authentication ,userController.getUserProfile)
+router.get("/user/:userId/profile", MW.Authentication ,userController.getUserProfile)
+router.put("/user/:userId/profile",MW.Authentication ,userController.updateUsersProfile)
 
 
 

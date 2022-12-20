@@ -1,6 +1,8 @@
 const userModel = require("../Model/userModel")
 const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 const{uploadFile} = require("../aws/aws")
+
 const{isValid,
     isValidEmail,
     isValidPassword,
@@ -100,29 +102,45 @@ const registerUser = async (req, res) => {
             const email = req.body.email
             const password = req.body.password
     
-            if(!email) return res.status(400).send({status : false , message : "email id is required"})
-            if(!password) return res.status(400).send({status : false , message : "password  is required"})
+            if(!email) {
+              return res.status(400).send({status : false , message : "email id is required"})
+            }
+
+            if(!password) {
+              return res.status(400).send({status : false , message : "password  is required"})
+            }
+
+            if(!isValidEmail(email)){
+              return res.status(400).send({status : false , message : "email id is required"})
+            }
             
-            if(!isValidEmail(email)) return res.status(400).send({status : false , message : "email id is required"})
-            if(!isValidPassword(password)) return res.status(400).send({status : false , message : "password  is required"})
+            if(!isValidPassword(password)){
+               return res.status(400).send({status : false , message : "password  is required"})
+            }
     
-            let getUser = await userModel.findOne({email}).select({password : 1, _id : 0})
+            let getUser = await userModel.findOne({email:email})
            
-            if(!getUser) return res.status(404).send({status : false , message : "User Not Found"})
+            if(!getUser) {
+              return res.status(404).send({status : false , message : "User Not Found"})
+            }
     
             const checkPassword = await bcrypt.compare( password, getUser.password)
-            if(!checkPassword) return res.status(401).send({ status: false, msg: "Password is incorrect" })
+
+            if(!checkPassword) {
+              return res.status(401).send({ status: false, msg: "Password is incorrect" })
+            }
     
-            let Payload = {
-                userId: getUser._id,
-                emailId: getUser.email,
-                Batch: "lithium",
-                Group: "1",
-                Project: "project-5-Products-Management-Group-1",
-              }
-    
-            const  token = jwt.sign( Payload ,"key-group-1" ,  {expiresIn: "60m"} )
-            return res.status(200).send({ status: true, message: "token is successfully generated", userId : token.userId ,  token: token })
+            let payload = {
+              userId: getUser._id.toString(),
+              emailId: getUser.email,
+              Batch: "lithium",
+              Group: "1",
+              Project: "project-5-Products-Management-Group-1",
+            }
+
+            const  token = jwt.sign(payload,"key-group-1" ,  {expiresIn: "60m"} )
+          
+            return res.status(200).send({ status: true, message: "token is successfully generated", data:{userId: getUser._id,token:token}})
     
         }catch(err){
         return res.status(500).send({status : false, message : err.message})
@@ -132,29 +150,26 @@ const registerUser = async (req, res) => {
     const getUserProfile = async function(req,res){
       try{
           const userId = req.params.userId;
-         
+          const tokenUserId  = req.userId    
+
           if(!userId){
               return res.status(400).send({status:false, message:`UserId is required`})
           }
           if(!isValidObjectId(userId)){
               return res.status(400).send({status:false, message:`userId is invalid userId`})
           }
-
-          //uncomment after varify token with
   
-        //   const tokenUserId  = req.decodedToken     
+          if(!tokenUserId){
+              return res.status(400).send({status:false, message:`tokenUserId is required`})
+          }
   
-        //   if(!tokenUserId){
-        //       return res.status(400).send({status:false, message:`tokenUserId is required`})
-        //   }
+          if(!isValidObjectId(tokenUserId)){
+              return res.status(400).send({status:false, message:`tokenUser is invalid`})
+          }
   
-        //   if(!isValidObjectId(tokenUserId)){
-        //       return res.status(400).send({status:false, message:`tokenUser is invalid`})
-        //   }
-  
-        //   if(tokenUserId != userId){
-        //       return res.status(403).send({status:false, message:`user is not authorised to get profile of this user`})
-        //   }git
+          if(tokenUserId != userId){
+              return res.status(403).send({status:false, message:`you are not loggedIn `})
+          }
   
           let user = await userModel.findOne({_id: userId})
   
@@ -169,6 +184,56 @@ const registerUser = async (req, res) => {
           return
       }
   }
+
+
+
+  const updateUsersProfile = async function (req, res) {
+    try {
+      let userId = req.params.userId
+      let update = req.body
+
+      let { fname, lname, password, phone, email } = update
+
+      if (Object.keys(update).length == 0) { return res.status(400).send({ status: false, msg: "incomplete request data provide more data" }) }
+
+      if (fname || lname || password || email || phone) {
+        if (fname) {
+          if (!isValidName(fname)) return res.status(400).send({ status: false, message: "please provide valid fname" })
+        }
+        if (lname) {
+          if (!isValidName(lname)) return res.status(400).send({ status: false, message: "please provide valid lname" })
+        }
+        if (password) {
+          if (!isValidPassword(password)) return res.status(400).send({ status: false, message: "please provide valid password" })
+        }
+        if (phone) {
+          if (!isValidPhone(phone)) return res.status(400).send({ status: false, message: "please provide valid PhoneNumber" })
+          const UnPhone = await userModel.findOne({ phone: phone })
+          if (UnPhone) return res.status(400).send({ status: false, message: "Number already exists" })
+        }
+        if (email) {
+          if (!isValidEmail(email)) return res.status(400).send({ status: false, message: "please provide valid email" })
+          const UnEmail = await userModel.findOne({ email: email })
+          if (UnEmail) return res.status(400).send({ status: false, message: "email already exists" })
+
+        }
+        let checkisDleted = await userModel.findOne({ _id: userId })
+
+        if (!checkisDleted) return res.status(404).send({ status: false, msg: "no users found" })
+
+
+        let users = await userModel.findOneAndUpdate({ _id: userId },
+          {
+            fname: fname, lname: lname, password: password, email: email
+          }, { new: true })
+        return res.status(200).send({ status: true, message: "successful", data: users })
+      }
+  
+    }catch(err){
+      return res.status(500).send({ status: false, message: err.message })
+    }
+    
+  }
   
 
-    module.exports={registerUser, login, getUserProfile }
+    module.exports={registerUser, login, getUserProfile, updateUsersProfile }

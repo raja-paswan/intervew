@@ -4,23 +4,27 @@ const userModel = require("../Model/userModel")
 
 const Authentication = async (req, res, next) => {
     try {
-        const Token = req.headers["x-api-key"]
-        if (!Token) return res.status(400).send({ status: false, message: "token is not present" })
+        let Token = req.headers["authorization"]
 
-        jwt.verify(Token, "key-group-1", function (err, token){
-        if (err) {
-        return res.status(401).send({ status: false, message: " Token is invalid Or Token has been Expired" })
+        if (!Token){
+            return res.status(400).send({ status: false, message: "token is not present" })
         }
-        else {
-        req.userId = token.userId
-        next()
-        }})
+        
+        Token = Token.slice(7)
 
+        jwt.verify(Token,"key-group-1", function (err, decoded){
+            if(err){
+                return res.status(400).send({status:false, message:`invalid token`})
+            }else{
+                req.userId = decoded.userId
+                next()
+            }
+        })
     }
     catch (err) {
         return res.status(500).send({ status: false, message: err.message })
     }
-}
+};
 
 
 const Authrization = async (req, res, next) => {
