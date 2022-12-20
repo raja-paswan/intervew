@@ -705,6 +705,19 @@ const isValidCity = (cityname) => {
     return false
   };
 
+  const ValidTitle = function(name) {
+    if (/^[a-zA-Z\.]*$/.test(name)) return true
+    return false
+  }
+
+  const isValidPrice = function(price)
+{
+  if(/^[(0-9)+.?(0-9)*]+$/.test(price)) return true
+  else  return false
+}
+
+const checkSize = function(array){}
+
 
 
 
@@ -721,5 +734,8 @@ module.exports = {
   isValidObjectId,
   isValidImg,
   isValidTitle,
-  isValidCity
+  isValidCity,
+  ValidTitle,
+  isValidPrice,
+  checkSize
 };
