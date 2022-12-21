@@ -716,7 +716,14 @@ const isValidCity = (cityname) => {
   else  return false
 }
 
-const checkSize = function(array){}
+const checkSize = function(array){
+  const ToCheck = ["S", "XS", "M", "X", "L", "XXL", "XL"]
+  for(i of array){
+    if(!ToCheck.includes(i)) return false
+    continue
+  }
+  return true
+}
 
 
 
