@@ -724,6 +724,10 @@ const checkSize = function(array){
   }
   return true
 }
+const isValidSize = (sizes) => {
+  return ["S", "XS","M","X", "L","XXL", "XL"].includes(sizes);
+}
+
 
 
 
@@ -744,5 +748,6 @@ module.exports = {
   isValidCity,
   ValidTitle,
   isValidPrice,
-  checkSize
+  checkSize,
+  isValidSize
 };
