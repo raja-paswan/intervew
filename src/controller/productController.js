@@ -121,4 +121,33 @@ const getProductById = async (req,res)=>{
         return res.status(500).send({status : false , message : err.message})
         }
 }
-module.exports = { creatProduct , getProductById ,getProduct}
+
+const deleteProduct = async function(req,res){
+    try{
+        const productId = req.params.productId;
+
+        if(!productId){
+            return res.status(400).send({staus:false, message:`ProductId is Required`})
+        }
+
+        if(!(isValidObjectId(productId))){
+            return res.status(400).send({status:false, message:`Invalid ProudctId`})
+        }
+
+        const removeProduct = await productModel.findOneAndUpdate({_id: productId, isDeleted:false},
+            {$set:{isDeleted:true, deletedAt: Date.now()}}
+            );
+
+            if(!removeProduct){
+                 res.status(400).send({status:false, message:`Product is Not Found or Product is already Deleted`})
+                 return
+            }else{
+                res.status(200).send({status:true, message:`Deleted Successfully`})
+                return
+            }
+
+    }catch(error){
+        return res.status(400).send({status:false, Message: error.message})
+    }
+}
+module.exports = { creatProduct , getProductById ,getProduct, deleteProduct}
