@@ -219,9 +219,6 @@ const updateProduct = async (req,res)=>{
         }else{
             return res.status(400).send({status : false , message : "empty string given" })
         }
-        
-
-        
             // if (availableSizes) {
 
             //     let sizeArray = found.availableSizes
@@ -232,9 +229,6 @@ const updateProduct = async (req,res)=>{
             //     data.availableSizes = result
     
             // }
-    
-
-
         let updatedProduct = await productModel.findByIdAndUpdate(
         { _id :productId},
         data,
@@ -249,32 +243,28 @@ const updateProduct = async (req,res)=>{
 }
 
 
-const deleteProduct = async function(req,res){
-    try{
+const deleteProduct = async function(req,res)
+{
+        try{
         const productId = req.params.productId;
-
         if(!productId){
-            return res.status(400).send({staus:false, message:`ProductId is Required`})
+        return res.status(400).send({staus:false, message:`ProductId is Required`})
         }
-
         if(!(isValidObjectId(productId))){
-            return res.status(400).send({status:false, message:`Invalid ProudctId`})
+        return res.status(400).send({status:false, message:`Invalid ProudctId`})
         }
-
         const removeProduct = await productModel.findOneAndUpdate({_id: productId, isDeleted:false},
-            {$set:{isDeleted:true, deletedAt: Date.now()}}
-            );
-
-            if(!removeProduct){
-                 res.status(400).send({status:false, message:`Product is Not Found or Product is already Deleted`})
-                 return
-            }else{
-                res.status(200).send({status:true, message:`Deleted Successfully`})
-                return
-            }
-
-    }catch(error){
+        {$set:{isDeleted:true, deletedAt: Date.now()}}
+        );
+        if(!removeProduct){
+        res.status(400).send({status:false, message:`Product is Not Found or Product is already Deleted`})
+        return
+        }else{
+        res.status(200).send({status:true, message:`Deleted Successfully`})
+        return
+        }
+        }catch(error){
         return res.status(400).send({status:false, Message: error.message})
-    }
+        }
 }
 module.exports = { creatProduct , getProductById ,getProduct, deleteProduct, updateProduct }

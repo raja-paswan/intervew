@@ -17,130 +17,95 @@ const{isValid,
     isValidCity} =require("../validation/validation")
 
 const registerUser = async (req, res) => {
-    try {
+        try {
         let data = req.body
         let image = req.files
         console.log(image)
         if (Object.keys(data).length == 0)
-            return res
-                .status(400)
-                .send({ status: false, message: "please give some data" });
-                
+        return res.status(400).send({ status: false, message: "please give some data" });       
         const { fname, lname, email, phone, password, address, } = data
-
         if (!fname) return res.status(400).send({status:false,message:"please provide fname"})
         if (!isValidName(fname)) return res.status(400).send({status:false,message:"please provide valid fname"})
-
         if (!lname) return res.status(400).send({status:false,message:"please provide lname"})
         if (!isValidName(lname)) return res.status(400).send({status:false,message:"please provide valid lname"})
-
         if (!email) return res.status(400).send({status:false,message:"please provide email"})
         if (!isValidEmail(email)) return res.status(400).send({status:false,message:"please provide valid email"})
         const UnEmail = await userModel.findOne({email:email})
         if(UnEmail) return res.status(400).send({status:false,message:"email already exists"})
-
         if (!phone) return res.status(400).send({status:false,message:"please provide Phone number"})
         if (!isValidPhone(phone)) return res.status(400).send({status:false,message:"please provide valid PhoneNumber"})
         const UnPhone = await userModel.findOne({phone:phone})
         if(UnPhone) return res.status(400).send({status:false,message:"Number already exists"})
-
         if (!password) return res.status(400).send({status:false,message:"please provide password"})
         if (!isValidPassword(password)) return res.status(400).send({status:false,message:"please provide valid password"})
-
         if (!address) return res.status(400).send({status:false,message:"please provide address"})
         // if(typeof(address)!=Object) return res.status(400).send({status:false,message:"address in invalid format"})
         // if (typeof(address.shipping)!=Object) return res.status(400).send({status:false,message:"shipping in invalid format"})
-
         if(!address.shipping.street) return res.status(400).send({status:false,message:"please provide shipping-street"})
         console.log(address.shipping.street)
         // if(!isValidstreet(address.shipping.street)) return res.status(400).send({status:false,message:"street(shipping) in invalid format"})
-
         if(!address.shipping.city) return res.status(400).send({status:false,message:"please provide shipping-city"})
         if(!isValidCity(address.shipping.city)) return res.status(400).send({status:false,message:"please provide valid shipping-city"})
-
         if(!address.shipping.pincode) return res.status(400).send({status:false,message:"please provide shipping-pincode"})
         if(!isValidPincode(parseInt(address.shipping.pincode))) return res.status(400).send({status:false,message:"please provide valid shipping-pincode"})
-
         // if (typeof(address.billing)!=Object) return res.status(400).send({status:false,message:"Billing add  in invalid format"})
-
         if(!address.billing.street) return res.status(400).send({status:false,message:"please provide billing-street"})
         // if(!isValidstreet(address.billing.street)) return res.status(400).send({status:false,message:"street(billing) in invalid format"})
-
         if(!address.billing.city) return res.status(400).send({status:false,message:"please provide billing-city"})
         if(!isValidCity(address.billing.city)) return res.status(400).send({status:false,message:"please provide valid billing-city"})
-
         if(!address.billing.pincode) return res.status(400).send({status:false,message:"please provide billing-pincode"})
         if(!isValidPincode(parseInt(address.billing.pincode))) return res.status(400).send({status:false,message:"please provide valid shipping-pincode"})
 
-  
-      if (!image[0]) { return res.status(400).send({status:false,message:"please provide image"})}
-      if (!isValidImg(image[0].originalname)){ return res.status(400).send({ status: false, message: "Image Should be of JPEG/ JPG/ PNG",  }) }
+        if (!image[0]) { return res.status(400).send({status:false,message:"please provide image"})}
+        if (!isValidImg(image[0].originalname)){ return res.status(400).send({ status: false, message: "Image Should be of JPEG/ JPG/ PNG",  }) }
 
-       let url = await uploadFile(image[0]);
+        let url = await uploadFile(image[0]);
         data["profileImage"] = url;
 
-    let salt = await bcrypt.genSalt(10);
-    data.password = await bcrypt.hash(data.password, salt);
+        let salt = await bcrypt.genSalt(10);
+        data.password = await bcrypt.hash(data.password, salt);
 
 
-    const user = await userModel.create(data);
-    return res.status(201).send({
+        const user = await userModel.create(data);
+        return res.status(201).send({
           status: true,
           message: "user is successfully created",
           data: user,
         })
-      }
-      catch(err){
+        }
+        catch(err){
         return res.status(500).send({ status: false, message:err.message})
-      }
-
+        }
     
-    }
+}
 
-    const login = async (req, res)=>{
+const login = async (req, res)=>{
         try{
-            const email = req.body.email
-            const password = req.body.password
+        const email = req.body.email
+        const password = req.body.password
     
-            if(!email) {
-              return res.status(400).send({status : false , message : "email id is required"})
-            }
-
-            if(!password) {
-              return res.status(400).send({status : false , message : "password  is required"})
-            }
-
-            if(!isValidEmail(email)){
-              return res.status(400).send({status : false , message : "email id is required"})
-            }
+        if(!email) return res.status(400).send({status : false , message : "email id is required"})
+        if(!password) return res.status(400).send({status : false , message : "password  is required"})
+        if(!isValidEmail(email))  return res.status(400).send({status : false , message : "email id is required"})
             
-            if(!isValidPassword(password)){
-               return res.status(400).send({status : false , message : "password  is required"})
-            }
-    
-            let getUser = await userModel.findOne({email:email})
-           
-            if(!getUser) {
-              return res.status(404).send({status : false , message : "User Not Found"})
-            }
-    
-            const checkPassword = await bcrypt.compare( password, getUser.password)
-
-            if(!checkPassword) {
-              return res.status(401).send({ status: false, msg: "Password is incorrect" })
-            }
-    
-            let payload = {
+        if(!isValidPassword(password)) return res.status(400).send({status : false , message : "password  is required"})
+        let getUser = await userModel.findOne({email:email})
+        if(!getUser) return res.status(404).send({status : false , message : "User Not Found"})
+            
+        const checkPassword = await bcrypt.compare( password, getUser.password)
+        if(!checkPassword)  return res.status(401).send({ status: false, msg: "Password is incorrect" })
+        let payload = 
+        {
               userId: getUser._id.toString(),
               emailId: getUser.email,
               Batch: "lithium",
               Group: "1",
               Project: "project-5-Products-Management-Group-1",
-            }
+        }
 
-            const  token = jwt.sign(payload,"key-group-1" ,  {expiresIn: "60m"} )
+        const  token = jwt.sign(payload,"key-group-1" ,  {expiresIn: "60m"} )
           
-            return res.status(200).send({ status: true, message: "token is successfully generated", data:{userId: getUser._id,token:token}})
+        return res.status(200).send({ status: true, message: "token is successfully generated", data:{userId: getUser._id,token:token}})
     
         }catch(err){
         return res.status(500).send({status : false, message : err.message})
@@ -188,52 +153,44 @@ const registerUser = async (req, res) => {
 
 
   const updateUsersProfile = async function (req, res) {
-    try {
+      try {
       let userId = req.params.userId
       let update = req.body
-
       let { fname, lname, password, phone, email } = update
-
       if (Object.keys(update).length == 0) { return res.status(400).send({ status: false, msg: "incomplete request data provide more data" }) }
-
       if (fname || lname || password || email || phone) {
-        if (fname) {
-          if (!isValidName(fname)) return res.status(400).send({ status: false, message: "please provide valid fname" })
-        }
-        if (lname) {
-          if (!isValidName(lname)) return res.status(400).send({ status: false, message: "please provide valid lname" })
-        }
-        if (password) {
-          if (!isValidPassword(password)) return res.status(400).send({ status: false, message: "please provide valid password" })
-        }
-        if (phone) {
-          if (!isValidPhone(phone)) return res.status(400).send({ status: false, message: "please provide valid PhoneNumber" })
-          const UnPhone = await userModel.findOne({ phone: phone })
-          if (UnPhone) return res.status(400).send({ status: false, message: "Number already exists" })
-        }
-        if (email) {
-          if (!isValidEmail(email)) return res.status(400).send({ status: false, message: "please provide valid email" })
-          const UnEmail = await userModel.findOne({ email: email })
-          if (UnEmail) return res.status(400).send({ status: false, message: "email already exists" })
-
-        }
-        let checkisDleted = await userModel.findOne({ _id: userId })
-
-        if (!checkisDleted) return res.status(404).send({ status: false, msg: "no users found" })
-
-
-        let users = await userModel.findOneAndUpdate({ _id: userId },
-          {
-            fname: fname, lname: lname, password: password, email: email
-          }, { new: true })
-        return res.status(200).send({ status: true, message: "successful", data: users })
+      if (fname) {
+      if (!isValidName(fname)) return res.status(400).send({ status: false, message: "please provide valid fname" })
+      }
+      if (lname) {
+      if (!isValidName(lname)) return res.status(400).send({ status: false, message: "please provide valid lname" })
+      }
+      if (password) {
+      if (!isValidPassword(password)) return res.status(400).send({ status: false, message: "please provide valid password" })
+      }
+      if (phone) {
+      if (!isValidPhone(phone)) return res.status(400).send({ status: false, message: "please provide valid PhoneNumber" })
+      const UnPhone = await userModel.findOne({ phone: phone })
+      if (UnPhone) return res.status(400).send({ status: false, message: "Number already exists" })
+      }
+      if (email) {
+      if (!isValidEmail(email)) return res.status(400).send({ status: false, message: "please provide valid email" })
+      const UnEmail = await userModel.findOne({ email: email })
+      if (UnEmail) return res.status(400).send({ status: false, message: "email already exists" })
+      }
+      let checkisDleted = await userModel.findOne({ _id: userId })
+      if (!checkisDleted) return res.status(404).send({ status: false, msg: "no users found" })
+      let users = await userModel.findOneAndUpdate({ _id: userId },
+      {
+      fname: fname, lname: lname, password: password, email: email
+      }, { new: true })
+      return res.status(200).send({ status: true, message: "successful", data: users })
       }
   
-    }catch(err){
+      }catch(err){
       return res.status(500).send({ status: false, message: err.message })
-    }
+      }
     
-  }
+}
   
-
-    module.exports={registerUser, login, getUserProfile, updateUsersProfile }
+module.exports={registerUser, login, getUserProfile, updateUsersProfile }
