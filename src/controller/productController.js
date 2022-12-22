@@ -140,8 +140,10 @@ const getProductById = async (req,res)=>{
 const updateProduct = async (req,res)=>{
     try{
         let data = req.body
+        
         let product_image = req.files
-        if(Object.keys(data).length == 0 && product_image.length == 0) return res.status(400).send({ status: false, message: "please give me some data for update " })
+        
+        if(Object.keys(data).length==0 && product_image==undefined) return res.status(400).send({ status: false, message: "please give me some data for update " })
         
         let { title , description ,price ,availableSizes, productImage, installments} = data
         
@@ -149,7 +151,7 @@ const updateProduct = async (req,res)=>{
           return res.status(400).send({ status: false, message: " invalid productImage " })
         }
 
-        if(product_image.length == 1){    
+        if(product_image != undefined){
         
         if(!isValidImg(product_image[0].originalname))
         { return res.status(400).send({ status: false, message: "Image Should be of JPEG/ JPG/ PNG",  }) }
@@ -190,61 +192,58 @@ const updateProduct = async (req,res)=>{
         // }  
         
 
-        if (availableSizes) {
-            availableSizes = availableSizes.toUpperCase().split(',').map((item) => item.trim())
-            for (let i = 0; i < availableSizes.length; i++) {
-            if (!isValidSize(availableSizes[i])) return res.status(400).send({ status: false, message: "Please mention valid Size!" });
+        // if (availableSizes) {
+        //     availableSizes = availableSizes.toUpperCase().split(',').map((item) => item.trim())
+        //     for (let i = 0; i < availableSizes.length; i++) {
+        //     if (!isValidSize(availableSizes[i])) return res.status(400).send({ status: false, message: "Please mention valid Size!" });
+        //     }
+        // }
+        if(availableSizes){
+            if(availableSizes.includes(',')){
+            let size = availableSizes.split(',')
+            const arr = size.map(x=> x.trim()).filter(y=>y.length!=0 && !y.includes(',')).map(z=>z.toUpperCase())
+            if(!checkSize(arr)) return res.status(400).send({ status: false, message: 'please provide only  this /"S"/"XS"/"M"/"X"/"L"/"XXL"/"XL"] Size '} )
+            let result = [... new Set(arr)]
+            data.availableSizes = result
+
+            
+            
+            }else{
+        
+            let size = availableSizes.split(' ')
+            const arr = size.map(x=> x.trim()).filter(y=>y.length!=0).map(z=>z.toUpperCase())
+            if(!checkSize(arr)) return res.status(400).send({ status: false, message: 'please provide only  this /"S"/"XS"/"M"/"X"/"L"/"XXL"/"XL"] Size '} )
+            let result = [... new Set(arr)]
+            data.availableSizes = result
             }
+        }else{
+            return res.status(400).send({status : false , message : "empty string given" })
         }
+        
 
         
-            // if(availableSizes.includes(',')){
-            // let size = availableSizes.split(',')
-            // const arr = size.map(x=> x.trim()).filter(y=>y.length!=0 && !y.includes(',')).map(z=>z.toUpperCase())
-            // if(!checkSize(arr)) return res.status(400).send({ status: false, message: 'please provide only  this /"S"/"XS"/"M"/"X"/"L"/"XXL"/"XL"] Size '} )
-            // data.availableSizes = arr
-            // }else{
-        
-            // let size = availableSizes.split(' ')
-            // const arr = size.map(x=> x.trim()).filter(y=>y.length!=0).map(z=>z.toUpperCase())
-            // if(!checkSize(arr)) return res.status(400).send({ status: false, message: 'please provide only  this /"S"/"XS"/"M"/"X"/"L"/"XXL"/"XL"] Size '} )
-            // let result = [... new Set(availableSizes)]
-            // data.availableSizes = result
+            // if (availableSizes) {
+
+            //     let sizeArray = found.availableSizes
+            //     for (let i = 0; i < sizeArray.length; i++) {
+            //         availableSizes.push(sizeArray[i])
+            //     }
+            //     let result = [... new Set(availableSizes)]
+            //     data.availableSizes = result
+    
             // }
-
-        
-            if (availableSizes) {
-
-                let sizeArray = found.availableSizes
-                for (let i = 0; i < sizeArray.length; i++) {
-                    availableSizes.push(sizeArray[i])
-                }
-                let result = [... new Set(availableSizes)]
-                data.availableSizes = result
-              console.log(result)
-            }
     
 
 
         let updatedProduct = await productModel.findByIdAndUpdate(
         { _id :productId},
-        {$set : 
-        {    
-        title : data.title,
-        description : data["description"],
-        price : data.price,
-        isFreeShipping : data.isFreeShipping,
-        installments : data.installments,
-        style : data.style,
-        productImage : data["productImage"],
-        availableSizes : data.availableSizes
-        }
-        },
+        data,
         { upsert : true, new : true,}
         )
 
        return res.status(200).send({status : true, data : updatedProduct})
-       }catch(err){
+       }
+       catch(err){
         return res.status(500).send({status : false , message : err.message })
       }
 }
