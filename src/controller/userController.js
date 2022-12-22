@@ -1,7 +1,7 @@
 const userModel = require("../Model/userModel")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
-const{uploadFile} = require("../aws/aws")
+const{ uploadFile } = require("../aws/aws")
 
 const{isValid,
     isValidEmail,

@@ -149,7 +149,7 @@ const updateProduct = async (req,res)=>{
           return res.status(400).send({ status: false, message: " invalid productImage " })
         }
 
-        if(product_image.length == 1){
+        if(product_image.length == 1){    
         
         if(!isValidImg(product_image[0].originalname))
         { return res.status(400).send({ status: false, message: "Image Should be of JPEG/ JPG/ PNG",  }) }
@@ -187,7 +187,8 @@ const updateProduct = async (req,res)=>{
         // if(availableSizes){
         // availableSizes = availableSizes.toUpperCase().split(' ').map((e)=> e.trim())
         // // if(!checkSize(availableSizes)) return res.status(400).send({status : false , message : "invalid Size"})
-        // }
+        // }  
+        
 
         if (availableSizes) {
             availableSizes = availableSizes.toUpperCase().split(',').map((item) => item.trim())
@@ -196,6 +197,7 @@ const updateProduct = async (req,res)=>{
             }
         }
 
+        
             // if(availableSizes.includes(',')){
             // let size = availableSizes.split(',')
             // const arr = size.map(x=> x.trim()).filter(y=>y.length!=0 && !y.includes(',')).map(z=>z.toUpperCase())
@@ -219,7 +221,7 @@ const updateProduct = async (req,res)=>{
                 }
                 let result = [... new Set(availableSizes)]
                 data.availableSizes = result
-    
+              console.log(result)
             }
     
 
