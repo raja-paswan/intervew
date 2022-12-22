@@ -2,10 +2,11 @@ const userModel = require('../Model/userModel')
 const productModel = require('../Model/productModel')
 const cartModel = require('../Model/cartModel')
 const{isValidObjectId,isValidRequestBody} = require("../validation/validation")
+const { findByIdAndUpdate } = require('../Model/productModel')
 
 
 const createCart = async function(req,res){
-    // try{
+    try{
         const userId = req.params.userId
         
         const cartData = req.body;
@@ -51,6 +52,7 @@ const createCart = async function(req,res){
         if(!carT) {return res.status(404).send({status:false,message:`unable to find cart`})}
 
        const found = carT.items.find(x=>x.productId==productId)
+       
        if(found!=undefined){
         carT.items[carT.items.indexOf(found)].quantity = carT.items[carT.items.indexOf(found)].quantity+1
        }else{
@@ -74,9 +76,84 @@ const createCart = async function(req,res){
 
 
 
-    // }catch(error){
-    //     return res.status(500).send({status:false, messsage:error.messsage})
-    // }
+    }catch(error){
+        return res.status(500).send({status:false, messsage:error.messsage})
+    }
 }
 
-module.exports = {createCart}
+const getcart = async (req,res)=>{
+    try{
+    let userId = req.params.userId 
+    if(!userId) return res.status(400).send({status : false , message : "please provide userId"})
+    if(!isValidObjectId(userId)) return res.status(400).send({status : false , message : " inValid userId"})
+  
+    let checkUser = await userModel.findOne({_id : userId })
+    if(!checkUser) return res.status(404).send({status : false , message : "Given  userId not exits our user data "})
+
+     let found_Cart = await cartModel.findOne({userId : userId})
+     if(!found_Cart) return res.status(404).send({status : false , message : "Given  userId not exits our cart data"})
+   
+
+     return res.status(200).send({status : false, data : found_Cart })
+
+    }catch(err){
+    return res.status(500).send({ status : false, message : err.message })
+    }
+}
+
+const  updateCart = async (req,res)=>{
+    try{
+        let data = req.body
+        if(!isValidRequestBody(data)) return res.status(400).send({status:false,message:"plese provide data"})
+        const{cartId,productId,removeProduct} = data
+        if(!cartId) return res.status(400).send({status:false,message:"plese provide cartId"})
+        if(!productId) return res.status(400).send({status:false,message:"plese provide productId"})
+        let product = await productModel.findOne({_id:productId,isDeleted:false})
+        if(!product) return res.status(404).send({status:false,message:"unable to find product"})
+        console.log(removeProduct)
+        if(removeProduct!=1 && removeProduct!=0) return res.status(400).send({status:false,message:"do you want to delete product(use removeProduct:0) or if you want to reduce quantity(use removeProduct:1"})
+        
+        let carT = await cartModel.findById(cartId).lean()
+         
+        if(!carT) return res.status(404).send({status:false,message:"unable to find cart"})
+        const found = carT.items.find(x=>x.productId==productId)
+        if(!found) return res.status(404).send({status:false,message:"unable to find product in cart"})
+
+        if(removeProduct =="0"){
+        carT.items.splice(carT.items.indexOf(found),1)
+        carT.totalItems = carT.totalItems -1
+        carT.totalPrice = carT.totalPrice-product.price
+
+        
+    }
+    if(removeProduct=="1"){
+        // let carT = await cartModel.findById(cartId).lean()
+        // if(!carT) return res.status(404).send({status:false,message:"unable to find cart"})
+        // const found = carT.items.find(x=>x.productId==productId)
+        // if(!found) return res.status(404).send({status:false,message:"unable to find product in cart"})
+        carT.items[carT.items.indexOf(found)].quantity = carT.items[carT.items.indexOf(found)].quantity-1
+        
+        if(carT.items[carT.items.indexOf(found)].quantity==0){
+            carT.items.splice(carT.items.indexOf(found),1)
+            carT.totalItems=carT.totalItems-1
+        }
+        
+        carT.totalPrice = carT.totalPrice-product.price
+        
+        
+        
+    }
+    
+    const toSend = await cartModel.findByIdAndUpdate(cartId,{
+        items:carT.items,
+        totalItems:carT.totalItems,
+        totalPrice:carT.totalPrice,
+    
+    },{new:true})
+    res.status(200).send({status:true,message:"sucess",data:toSend})
+}catch(err){
+    return res.status(500).send({status:false,message:err.message})
+}
+}
+
+module.exports = {createCart,getcart,updateCart}
