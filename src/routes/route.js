@@ -20,7 +20,7 @@ router.put("/products/:productId",updateProduct)
 router.delete("/products/:productId", deleteProduct)
 
 //Cart API's
-router.post("/",MW.Authentication,cartController.createCart)
+router.post("/users/:userId/cart",cartController.createCart)
 
 
 
