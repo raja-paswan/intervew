@@ -1,16 +1,16 @@
 const express = require("express")
 const router = express.Router()
-const { Authentication} = require('../middleware/auth')
+const { Authentication, Authrization} = require('../middleware/auth')
 const{ getProduct, getProductById , creatProduct , updateProduct , deleteProduct} = require("../controller/productController")
-const { getUserProfile, updateUsersProfile, login , registerUser} = require("../controller/userController")
+const { getUserProfile, updateUserProfile, login , registerUser} = require("../controller/userController")
 const { createCart, getcart ,updateCart ,deleteCart } = require("../controller/cartController")
 
 //--------------------------------------------User Api--------------------------------------------------------------//
 
 router.post("/register", registerUser )
 router.post("/login",  login )
-router.get("/user/:userId/profile",  Authentication ,  getUserProfile )
-router.put("/user/:userId/profile",  Authentication , updateUsersProfile )
+router.get("/user/:userId/profile",  Authentication , Authrization, getUserProfile )
+router.put("/user/:userId/profile",  Authentication , Authrization,updateUserProfile )
 
 //--------------------------------------------Product Api-----------------------------------------------------------//
 
@@ -22,10 +22,10 @@ router.delete("/products/:productId",  deleteProduct )
 
 //--------------------------------------------Cart Api--------------------------------------------------------------//
 
-router.post("/users/:userId/cart",  createCart )
-router.get("/users/:userId/cart",  getcart )
-router.put("/users/:userId/cart",  updateCart )
-router.delete("/users/:userId/cart",  deleteCart )
+router.post("/users/:userId/cart",Authentication , createCart )
+router.get("/users/:userId/cart", Authentication,Authrization, getcart )
+router.put("/users/:userId/cart",  Authentication,Authrization,updateCart )
+router.delete("/users/:userId/cart", Authentication,Authrization, deleteCart )
 
 //---------------------------------------------Order Api------------------------------------------------------------//
 
