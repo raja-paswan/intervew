@@ -92,10 +92,11 @@ const  updateCart = async (req,res)=>
         if(!carT) return res.status(404).send({status:false,message:"unable to find cart"})
         const found = carT.items.find(x=>x.productId==productId)
         if(!found) return res.status(404).send({status:false,message:"unable to find product in cart"})
+
         if(removeProduct =="0"){
         carT.items.splice(carT.items.indexOf(found),1)
         carT.totalItems = carT.totalItems -1
-        carT.totalPrice = carT.totalPrice-product.price
+        carT.totalPrice = carT.totalPrice-(product.price*carT.items[carT.items.indexOf(found)].quantity)
         }
         if(removeProduct=="1"){
         // let carT = await cartModel.findById(cartId).lean()
