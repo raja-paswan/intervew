@@ -22,7 +22,7 @@ router.delete("/products/:productId",  deleteProduct )
 
 //--------------------------------------------Cart Api--------------------------------------------------------------//
 
-router.post("/users/:userId/cart",Authentication, createCart )
+router.post("/users/:userId/cart", createCart )
 router.get("/users/:userId/cart", Authentication,Authrization, getcart )
 router.put("/users/:userId/cart",  Authentication,Authrization,updateCart )
 router.delete("/users/:userId/cart", Authentication,Authrization, deleteCart )
