@@ -25,7 +25,7 @@ const creatProduct = async (req,res)=> {
         return res.status(400).send({ status: false, message: "invalid intallment format use number format" })
         }
         }
-        
+        if(!availableSizes) return res.status(400).send({status : false , message :"Give me at least one size" })
         if(availableSizes.includes(',')){
         let size = availableSizes.split(',')
         const arr = size.map(x=> x.trim()).filter(y=>y.length!=0 && !y.includes(',')).map(z=>z.toUpperCase())
@@ -143,15 +143,15 @@ const updateProduct = async (req,res)=>{
         
         let product_image = req.files
         
-        if(Object.keys(data).length==0 && product_image==undefined) return res.status(400).send({ status: false, message: "please give me some data for update " })
+        if(Object.keys(data).length==0 && product_image.length==0) return res.status(400).send({ status: false, message: "please give me some data for update " })
         
         let { title , description ,price ,availableSizes, productImage, installments} = data
-        
-        if(productImage){
+        if(productImage)
+        if(productImage.trim().length == 0 || productImage){
           return res.status(400).send({ status: false, message: " invalid productImage " })
         }
 
-        if(product_image != undefined){
+        if(product_image.length == 1){
         
         if(!isValidImg(product_image[0].originalname))
         { return res.status(400).send({ status: false, message: "Image Should be of JPEG/ JPG/ PNG",  }) }
@@ -216,9 +216,10 @@ const updateProduct = async (req,res)=>{
             let result = [... new Set(arr)]
             data.availableSizes = result
             }
-        }else{
-            return res.status(400).send({status : false , message : "empty string given" })
         }
+        // else{
+        //     return res.status(400).send({status : false , message : "empty string given" })
+        // }
             // if (availableSizes) {
 
             //     let sizeArray = found.availableSizes

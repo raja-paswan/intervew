@@ -20,7 +20,7 @@ const registerUser = async (req, res) => {
         try {
         let data = req.body
         let image = req.files
-        console.log(image)
+      // console.log(image)
         if (Object.keys(data).length == 0)
         return res.status(400).send({ status: false, message: "please give some data" });       
         const { fname, lname, email, phone, password, address, } = data
@@ -156,7 +156,7 @@ const login = async (req, res)=>{
     try{
         const userId = req.params.userId;
 
-        const tokenUserId  =  decoded.userId
+        const tokenUserId  =  req.userId
 
         if(!userId){
             return res.status(400).send({status:false, message:`UserId is Required`})
@@ -228,13 +228,19 @@ const login = async (req, res)=>{
         if(address){
             const {shipping, billing} = address
             if(shipping){
+                if(shipping.street)
                 if(!isValid(shipping.street)){return res.status(400).send({status:false, message:`enter valid shipping street`})};
+                if(shipping.pincode)
                 if(!isValidPincode(shipping.pincode)){return res.status(400).send({status:false, message:`enter valid shipping pin`})}
+                if(shipping.city)
                 if(!isValid(shipping.city)){return res.status(400).send({status:false, message:`enter valid shippingcity name`})}
             }
             if(billing){
-                if(!isValid(billing.shipping.street)){return res.status(400).send({status:false, message:`enter valid billing street`})};
+                if(billing.street)
+                if(!isValid(billing.street)){return res.status(400).send({status:false, message:`enter valid billing street`})};
+                if(billing.pincode)
                 if(!isValidPincode(billing.pincode)){return res.status(400).send({status:false, message:`enter valid billing pin`})}
+                if(billing.city)
                 if(!isValid(billing.city)){return res.status(400).send({status:false, message:`enter valid billing city name`})}
             }
             updateObj.address = address

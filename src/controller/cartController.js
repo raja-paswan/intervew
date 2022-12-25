@@ -6,7 +6,7 @@ const{isValidObjectId, isValidRequestBody} = require("../validation/validation")
 
 
 const createCart = async function(req,res){
-        try{
+    //    try{
         const userId = req.params.userId
         const cartData = req.body;
         if(!userId){return res.status(400).send({status:false, message:`provide userId`})}
@@ -55,9 +55,9 @@ const createCart = async function(req,res){
         },
         {new:true})
         return res.status(201).send({status:true,message:"success",data:toSend})
-        }catch(error){
-        return res.status(500).send({status:false, messsage:error.messsage})
-}
+//         }catch(error){
+//         return res.status(500).send({status:false, messsage:error.messsage})
+// }
 }
 
 const getcart = async (req,res)=>
