@@ -95,22 +95,34 @@ const getcart = async (req,res)=>
 const  updateCart = async (req,res)=>
 {
         try{
-        let data = req.body
+            let data = req.body
+
         if(!isValidRequestBody(data)) return res.status(400).send({status:false,message:"plese provide data"})
-        const{cartId,productId,removeProduct} = data
+
+        const { cartId, productId, removeProduct } = data
+
         if(!cartId) return res.status(400).send({status:false,message:"plese provide cartId"})
+
         if(!productId) return res.status(400).send({status:false,message:"plese provide productId"})
-        let product = await productModel.findOne({_id:productId,isDeleted:false})
+
+        let product = await productModel.findOne({_id:productId, isDeleted:false})
+
         if(!product) return res.status(404).send({status:false,message:"unable to find product"})
-        console.log(removeProduct)
+
         if(removeProduct!=1 && removeProduct!=0) return res.status(400).send({status:false,message:"do you want to delete product(use removeProduct:0) or if you want to reduce quantity(use removeProduct:1"})
+
         let carT = await cartModel.findById(cartId).lean()
+
         if(!carT) return res.status(404).send({status:false,message:"unable to find cart"})
+
         const found = carT.items.find(x=>x.productId==productId)
+
         if(!found) return res.status(404).send({status:false,message:"unable to find product in cart"})
 
         if(removeProduct =="0"){
+
         carT.items.splice(carT.items.indexOf(found),1)
+        
         carT.totalItems = carT.totalItems -1
         carT.totalPrice = carT.totalPrice-(product.price*carT.items[carT.items.indexOf(found)].quantity)
         }
