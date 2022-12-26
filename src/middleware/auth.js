@@ -3,18 +3,18 @@ const { isValidObjectId } = require('mongoose')
 const userModel = require("../Model/userModel")
 
 const Authentication = async (req, res, next) => {
-    try {
+      try {
         let Token = req.headers["authorization"]
-
         if (!Token){
             return res.status(400).send({ status: false, message: "token is not present" })
         }
         
         Token = Token.slice(7)
+        
 
         jwt.verify(Token,"key-group-1", function (err, decoded){
             if(err){
-                return res.status(400).send({status:false, message:`invalid token`})
+                return res.status(401).send({status:false, message:`invalid token`})
             }else{
                 req.userId = decoded.userId
                 next()

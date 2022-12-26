@@ -27,7 +27,7 @@ const orderSchema = new mongoose.Schema(
       required: true,
       comment: "Holds total number of items in the cart",
     },
-    totatlQuantity: {
+    totalQuantity: {
       type: Number,
       required: true,
       comment: "Holds total number of quantity in the cart",
@@ -38,7 +38,7 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: [pending, completed, canceled],
+      enum: ['pending', 'completed', 'canceled'],
       default: "pending",
     },
     deletedAt: {
