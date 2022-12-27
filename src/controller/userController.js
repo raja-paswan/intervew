@@ -20,7 +20,7 @@ const registerUser = async (req, res) => {
         try {
         let data = req.body
         let image = req.files
-      // console.log(image)
+     
         if (Object.keys(data).length == 0)
         return res.status(400).send({ status: false, message: "please give some data" });       
         const { fname, lname, email, phone, password, address, } = data
@@ -39,18 +39,17 @@ const registerUser = async (req, res) => {
         if (!password) return res.status(400).send({status:false,message:"please provide password"})
         if (!isValidPassword(password)) return res.status(400).send({status:false,message:"Password should be 8 to 15"})
         if (!address) return res.status(400).send({status:false,message:"please provide address"})
-        // if(typeof(address)!=Object) return res.status(400).send({status:false,message:"address in invalid format"})
-        // if (typeof(address.shipping)!=Object) return res.status(400).send({status:false,message:"shipping in invalid format"})
+       
         if(!address.shipping.street) return res.status(400).send({status:false,message:"please provide shipping-street"})
         console.log(address.shipping.street)
-        // if(!isValidstreet(address.shipping.street)) return res.status(400).send({status:false,message:"street(shipping) in invalid format"})
+       
         if(!address.shipping.city) return res.status(400).send({status:false,message:"please provide shipping-city"})
         if(!isValidCity(address.shipping.city)) return res.status(400).send({status:false,message:"please provide valid shipping-city"})
         if(!address.shipping.pincode) return res.status(400).send({status:false,message:"please provide shipping-pincode"})
         if(!isValidPincode(parseInt(address.shipping.pincode))) return res.status(400).send({status:false,message:"please provide valid shipping-pincode"})
-        // if (typeof(address.billing)!=Object) return res.status(400).send({status:false,message:"Billing add  in invalid format"})
+        
         if(!address.billing.street) return res.status(400).send({status:false,message:"please provide billing-street"})
-        // if(!isValidstreet(address.billing.street)) return res.status(400).send({status:false,message:"street(billing) in invalid format"})
+       
         if(!address.billing.city) return res.status(400).send({status:false,message:"please provide billing-city"})
         if(!isValidCity(address.billing.city)) return res.status(400).send({status:false,message:"please provide valid billing-city"})
         if(!address.billing.pincode) return res.status(400).send({status:false,message:"please provide billing-pincode"})
@@ -115,34 +114,14 @@ const login = async (req, res)=>{
     const getUserProfile = async function(req,res){
       try{
           const userId = req.params.userId;
-          const tokenUserId  = req.userId    
-
-          if(!userId){
-              return res.status(400).send({status:false, message:`UserId is required`})
-          }
-          if(!isValidObjectId(userId)){
-              return res.status(400).send({status:false, message:`userId is invalid userId`})
-          }
-  
-          if(!tokenUserId){
-              return res.status(400).send({status:false, message:`tokenUserId is required`})
-          }
-  
-          if(!isValidObjectId(tokenUserId)){
-              return res.status(400).send({status:false, message:`tokenUser is invalid`})
-          }
-  
-          if(tokenUserId != userId){
-              return res.status(403).send({status:false, message:`you are not loggedIn `})
-          }
-  
+           
           let user = await userModel.findOne({_id: userId})
   
           if(!user){
               return res.status(404).send({status:false, message:`User not found`})
           }
   
-          res.status(200).send({status:true, message:"User profile details", data: user})
+        return  res.status(200).send({status:true, message:"User profile details", data: user})
   
       }catch(error){
           res.status(500).send({status:false, message:error.message})
@@ -156,40 +135,42 @@ const login = async (req, res)=>{
     try{
         const userId = req.params.userId;
 
-        const tokenUserId  =  req.userId
+        // const tokenUserId  =  req.userId
 
-        if(!userId){
-            return res.status(400).send({status:false, message:`UserId is Required`})
-        }
-        if(!isValidObjectId(userId)){
-            return res.status(400).send({status:false, message:`UserId is Invalid`})
-        }
+        // if(!userId){
+        //     return res.status(400).send({status:false, message:`UserId is Required`})
+        // }
+        // if(!isValidObjectId(userId)){
+        //     return res.status(400).send({status:false, message:`UserId is Invalid`})
+        // }
 
-        if(tokenUserId){
-            if(!isValidObjectId(tokenUserId)){
-            return res.status(400).send({status:false, message:`Token userId is invalid`})
-            }
-            if(tokenUserId != userId){
-                return res.status(403).send({status:false, message:`You are not authorised for update this user info`})
-            }
-            const checkUser = await userModel.findOne({_id: tokenUserId})
+        // if(tokenUserId){
+        //     if(!isValidObjectId(tokenUserId)){
+        //     return res.status(400).send({status:false, message:`Token userId is invalid`})
+        //     }
+        //     if(tokenUserId != userId){
+        //         return res.status(403).send({status:false, message:`You are not authorised for update this user info`})
+        //     }
+            const checkUser = await userModel.findOne({_id: userId})
 
             if(!checkUser){
                 return res.status(404).send({status:false, message:`User Not Found`})
             }
-        };
+        
         
         //validations Start
         let {fname, lname, email, profileImage, phone, password, address} = req.body;
         let updateObj = new Object()  
 
         if(fname){
-            if(!isValid(fname)){return res.status(400).send({status:false, message:`Enter valid First Name`})}
+            if(!isValid(fname)) return res.status(400).send({status:false, message:`Enter valid First Name`})
+            if(!isValidName(fname)) return res.status(400).send({status:false, message:`Enter valid First Name`})
             updateObj.fname = fname
         }
 
         if(lname){
             if(!isValid(lname)){return res.status(400).send({status:false, message:`Enter valid Last Name`})}
+            if(!isValidName(lname)) return res.status(400).send({status:false, message:`Enter valid last Name`})
             updateObj.lname = lname
         }
 
@@ -213,9 +194,13 @@ const login = async (req, res)=>{
             let hash = bcrypt.hashSync(password, 10)
              updateObj.password = hash 
         }
+        if(profileImage){
+            return res.status(400).send({status:false, message:`provide validimage`})
+        }
 
         //profile images validation start
          const file = req.files
+         if(!isValidImg(file[0].originalname)) return res.status(400).send({status:false, message:`provide validimage`})
 
          if(file.length>0){
             

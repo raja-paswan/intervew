@@ -43,11 +43,12 @@ const isValidObjectId = function (objectId) {
 const isValid = function (value) {
   if (typeof value === "undefined" || value === null) return false;
   if (typeof value === "string" && value.trim().length === 0) return false;
+  
   return true;
 };
 
 const isValidTitle = function(name) {
-  if (/^[a-zA-Z 0-9\.]*$/.test(name)) return true
+  if (/^[a-zA-Z0-9\s\.]*$/.test(name)) return true
  return false
 }
 

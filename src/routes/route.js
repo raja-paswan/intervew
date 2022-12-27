@@ -5,7 +5,7 @@ const{ getProduct, getProductById , creatProduct , updateProduct , deleteProduct
 const { getUserProfile, updateUserProfile, login , registerUser} = require("../controller/userController")
 const {createOrder, updateOrder} = require('../controller/orderController')
 const { createCart, getcart ,updateCart ,deleteCart } = require("../controller/cartController")
-const { } = require("../controller/orderController")
+
 
 //--------------------------------------------User Api--------------------------------------------------------------//
 
@@ -25,14 +25,14 @@ router.delete("/products/:productId",  deleteProduct )
 //--------------------------------------------Cart Api--------------------------------------------------------------//
 
 router.post("/users/:userId/cart", createCart )
-router.get("/users/:userId/cart", Authentication,Authrization, getcart )
-router.put("/users/:userId/cart",  Authentication,Authrization,updateCart )
-router.delete("/users/:userId/cart", Authentication,Authrization, deleteCart )
+router.get("/users/:userId/cart",  getcart )
+router.put("/users/:userId/cart", updateCart )
+router.delete("/users/:userId/cart",  deleteCart )
 
 //---------------------------------------------Order Api------------------------------------------------------------//
 
-router.post("/users/:userId/orders", Authentication,Authrization,createOrder )
-router.put("/users/:userId/orders",Authentication,Authrization, updateOrder )
+router.post("/users/:userId/orders",createOrder )
+router.put("/users/:userId/orders", updateOrder )
 
 
 
