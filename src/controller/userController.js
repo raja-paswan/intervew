@@ -14,7 +14,7 @@ const{isValid,
     isValidObjectId,
     isValidImg,
     isValidTitle,
-    isValidCity} =require("../validation/validation")
+    } =require("../validation/validation")
 
 const registerUser = async (req, res) => {
         try {
@@ -37,21 +37,21 @@ const registerUser = async (req, res) => {
         const UnPhone = await userModel.findOne({phone:phone})
         if(UnPhone) return res.status(400).send({status:false,message:"Number already exists"})
         if (!password) return res.status(400).send({status:false,message:"please provide password"})
-        if (!isValidPassword(password)) return res.status(400).send({status:false,message:"Password should be 8 to 15"})
+        if (!isValidPassword(password)) return res.status(400).send({status:false,message:"Password should be 8 to 15 and add atleast one capital alphabet"})
         if (!address) return res.status(400).send({status:false,message:"please provide address"})
        
         if(!address.shipping.street) return res.status(400).send({status:false,message:"please provide shipping-street"})
         console.log(address.shipping.street)
        
         if(!address.shipping.city) return res.status(400).send({status:false,message:"please provide shipping-city"})
-        if(!isValidCity(address.shipping.city)) return res.status(400).send({status:false,message:"please provide valid shipping-city"})
+        if(!isValidTitle(address.shipping.city)) return res.status(400).send({status:false,message:"please provide valid shipping-city"})
         if(!address.shipping.pincode) return res.status(400).send({status:false,message:"please provide shipping-pincode"})
         if(!isValidPincode(parseInt(address.shipping.pincode))) return res.status(400).send({status:false,message:"please provide valid shipping-pincode"})
         
         if(!address.billing.street) return res.status(400).send({status:false,message:"please provide billing-street"})
        
         if(!address.billing.city) return res.status(400).send({status:false,message:"please provide billing-city"})
-        if(!isValidCity(address.billing.city)) return res.status(400).send({status:false,message:"please provide valid billing-city"})
+        if(!isValidTitle(address.billing.city)) return res.status(400).send({status:false,message:"please provide valid billing-city"})
         if(!address.billing.pincode) return res.status(400).send({status:false,message:"please provide billing-pincode"})
         if(!isValidPincode(parseInt(address.billing.pincode))) return res.status(400).send({status:false,message:"please provide valid shipping-pincode"})
 
