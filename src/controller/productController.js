@@ -141,16 +141,18 @@ const updateProduct = async (req,res)=>{
         
         let product_image = req.files
         
+        
         if(!isValidRequestBody(data) && product_image==undefined) return res.status(400).send({ status: false, message: "please give me some data for update " })
-        if(product_image){
-        if(product_image.length==0){
-            return res.status(400).send({status:false,message:"please give image"})
-        }}
+        
+        
         let { title , description ,price ,availableSizes, productImage, installments} = data
-        if(productImage)
-        if(productImage.trim().length == 0 || productImage){
+        if(productImage){
+        if(productImage.trim().length == 0){
           return res.status(400).send({ status: false, message: " invalid productImage " })
         }
+        if(!isValidImg(productImage))  return res.status(400).send({ status: false, message: " invalid productImage " })
+    }
+   
 
         if(product_image.length == 1){
         
@@ -159,6 +161,7 @@ const updateProduct = async (req,res)=>{
         let url = await uploadFile(product_image[0])
         data["productImage"] = url
         }
+       
         const productId = req.params.productId
         if(!productId) return res.status(400).send({ status: false, message: "please give me productId " })
         if(!isValidObjectId(productId))  return res.status(400).send({ status: false, message: "Invalid productId" })
@@ -208,6 +211,10 @@ const updateProduct = async (req,res)=>{
             data.availableSizes = result
             }
         }
+        if(data.productImage==""){
+            
+            return res.status(400).send({status : false , message : "invalid image(empty)" })
+        }
         
         let updatedProduct = await productModel.findByIdAndUpdate(
         { _id :productId},
@@ -248,3 +255,4 @@ const deleteProduct = async function(req,res)
         }
 }
 module.exports = { creatProduct , getProductById ,getProduct, deleteProduct, updateProduct }
+
