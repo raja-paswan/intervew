@@ -99,7 +99,6 @@ module.exports = {
   isValidObjectId,
   isValidImg,
   isValidTitle,
-  isValidCity,
   ValidTitle,
   isValidPrice,
   checkSize,

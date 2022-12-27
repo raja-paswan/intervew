@@ -82,8 +82,8 @@ const getcart = async (req,res)=>
 
 const  updateCart = async (req,res)=>
 {
-        // try{
-            let data = req.body
+        try{
+        let data = req.body
 
         if(!isValidRequestBody(data)) return res.status(400).send({status:false,message:"plese provide data"})
 
@@ -132,9 +132,9 @@ const  updateCart = async (req,res)=>
     
         },{new:true})
         return  res.status(200).send({status:true,message:" update success",data:toSend})
-//         }catch(err){
-//         return res.status(500).send({status:false,message:err.message})
-// }
+        }catch(err){
+        return res.status(500).send({status:false,message:err.message})
+}
 }
 
 
@@ -142,20 +142,6 @@ const deleteCart = async (req, res) =>
 {
         try {
         let userId = req.params.userId
-        // if (!userId) {
-        // return res.status(400).send({ status: false, message: "UserId is missing in params" })
-        // }
-
-        // if (!isValidObjectId(userId)) {
-        // return res.status(400).send({ status: false, msg: "Invalid userId" });
-        // }
-
-        // let findUser = await userModel.findById({ _id: userId })
-        // if (!findUser) {
-        // return res.status(404).send({ status: false, message: "User not found" })
-        // }
-
-       
         const cart = await cartModel.findOneAndUpdate({ userId: userId }, { items: [], totalPrice: 0, totalItems: 0}, { new: true });
         if(!cart) return res.status(404).send({ status: false, message: "Given userId not exits in cartData " })
         return res.status(204).send({ status: true, message: 'Success'});

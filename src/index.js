@@ -8,7 +8,6 @@ app.use(multer().any())
 
 mongoose.set('strictQuery', false)
 mongoose.connect("mongodb+srv://AbhinavSIngh:9936522959@cluster0.wtmx5b4.mongodb.net/group1Database", { useNewUrlParser: true })
-
  .then(()=> console.log("MongoDb connected"))
  .catch((error)=>console.log(error))
 

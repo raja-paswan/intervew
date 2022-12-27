@@ -37,7 +37,7 @@ const registerUser = async (req, res) => {
         const UnPhone = await userModel.findOne({phone:phone})
         if(UnPhone) return res.status(400).send({status:false,message:"Number already exists"})
         if (!password) return res.status(400).send({status:false,message:"please provide password"})
-        if (!isValidPassword(password)) return res.status(400).send({status:false,message:"Password should be 8 to 15 and add atleast one capital alphabet"})
+        if (!isValidPassword(password)) return res.status(400).send({status:false,message:"Password should be 8 to 15 and add atleast one capital alphabet & atleast one special char"})
         if (!address) return res.status(400).send({status:false,message:"please provide address"})
        
         if(!address.shipping.street) return res.status(400).send({status:false,message:"please provide shipping-street"})
@@ -142,7 +142,6 @@ const login = async (req, res)=>{
             }
         
         
-        //validations Start
         let {fname, lname, email, profileImage, phone, password, address} = req.body;
         let updateObj = new Object()  
         if(!isValidRequestBody(req.body)) return res.status(400).send({status:false,message:"provide body detilies"})
@@ -182,7 +181,6 @@ const login = async (req, res)=>{
             return res.status(400).send({status:false, message:`provide validimage`})
         }
 
-        //profile images validation start
          const file = req.files
          if(file[0])
          if(!isValidImg(file[0].originalname)) return res.status(400).send({status:false, message:`provide validimage`})
@@ -192,9 +190,7 @@ const login = async (req, res)=>{
         let profilepic = await uploadFile(file[0])
         updateObj.profileImage = profilepic
         }
-        //profile valiation end
-     
-        // address validation start
+       
         if(address){
             const {shipping, billing} = address
             if(shipping){
@@ -216,8 +212,6 @@ const login = async (req, res)=>{
             updateObj.address = address
         }
 
-
-        //validations End
 
         const updateProfile = await userModel.findOneAndUpdate({_id:userId},{$set: updateObj},{new:true})
 
