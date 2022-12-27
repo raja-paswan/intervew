@@ -23,7 +23,7 @@ const creatProduct = async (req,res)=> {
         if(!isValidPrice(price)) return res.status(400).send({ status: false, message: "please provide valid price" })
         if(!currencyId) return res.status(400).send({ status: false, message: "please give currencyId" })
         if(currencyId)
-        if(currencyId !== "INR") return res.status(400).send({ status: false, message: "please provide 'INR' " })
+        if(currencyId.toUpperCase() !== "INR") return res.status(400).send({ status: false, message: "please provide 'INR' " })
         if(!currencyFormat) return res.status(400).send({ status: false, message: "please give currencyFormat" })
         if(currencyFormat)
         if(currencyFormat !== "₹") return res.status(400).send({ status: false, message: "please provide  '₹' " })
@@ -141,8 +141,11 @@ const updateProduct = async (req,res)=>{
         
         let product_image = req.files
         
-        if(!isValidRequestBody(data) && product_image.length==0) return res.status(400).send({ status: false, message: "please give me some data for update " })
-        
+        if(!isValidRequestBody(data) && product_image==undefined) return res.status(400).send({ status: false, message: "please give me some data for update " })
+        if(product_image){
+        if(product_image.length==0){
+            return res.status(400).send({status:false,message:"please give image"})
+        }}
         let { title , description ,price ,availableSizes, productImage, installments} = data
         if(productImage)
         if(productImage.trim().length == 0 || productImage){

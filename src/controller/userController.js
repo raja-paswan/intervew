@@ -135,22 +135,6 @@ const login = async (req, res)=>{
     try{
         const userId = req.params.userId;
 
-        // const tokenUserId  =  req.userId
-
-        // if(!userId){
-        //     return res.status(400).send({status:false, message:`UserId is Required`})
-        // }
-        // if(!isValidObjectId(userId)){
-        //     return res.status(400).send({status:false, message:`UserId is Invalid`})
-        // }
-
-        // if(tokenUserId){
-        //     if(!isValidObjectId(tokenUserId)){
-        //     return res.status(400).send({status:false, message:`Token userId is invalid`})
-        //     }
-        //     if(tokenUserId != userId){
-        //         return res.status(403).send({status:false, message:`You are not authorised for update this user info`})
-        //     }
             const checkUser = await userModel.findOne({_id: userId})
 
             if(!checkUser){
@@ -161,7 +145,7 @@ const login = async (req, res)=>{
         //validations Start
         let {fname, lname, email, profileImage, phone, password, address} = req.body;
         let updateObj = new Object()  
-
+        if(!isValidRequestBody(req.body)) return res.status(400).send({status:false,message:"provide body detilies"})
         if(fname){
             if(!isValid(fname)) return res.status(400).send({status:false, message:`Enter valid First Name`})
             if(!isValidName(fname)) return res.status(400).send({status:false, message:`Enter valid First Name`})
@@ -200,6 +184,7 @@ const login = async (req, res)=>{
 
         //profile images validation start
          const file = req.files
+         if(file[0])
          if(!isValidImg(file[0].originalname)) return res.status(400).send({status:false, message:`provide validimage`})
 
          if(file.length>0){
