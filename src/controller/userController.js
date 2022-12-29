@@ -61,7 +61,7 @@ const registerUser = async (req, res) => {
         let url = await uploadFile(image[0]);
         data["profileImage"] = url;
 
-        let salt = await bcrypt.genSalt(10);
+        let salt = await bcrypt.genSalt(1);
         data.password = await bcrypt.hash(data.password, salt);
 
 
